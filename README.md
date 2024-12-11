@@ -32,3 +32,11 @@ docker compose up --build
 ```bash
 docker compose down
 ```
+## 備考
+「docker-compose-corrected.txt」は「docker-compose.yml」を以下のプロンプトでClaudeに出力させたものです。
+
+> 内容を見て、間違っているところがあったら修正してください。
+> 
+> また、省略して書いている設定があったら、省略しない、より厳密な書き方に修正してください。
+> 
+> また、コメントにてつけた説明が合っているか確認し、間違っている場合はより適切なコメントを付けてください。
