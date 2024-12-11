@@ -1,9 +1,13 @@
 # todoアプリ
 
 ## 概要
-このアプリはdockerのサンプルプロジェクトから作成しました。(https://matsuand.github.io/docs.docker.jp.onthefly/get-started/）
+このアプリはdockerのサンプルプロジェクトから作成しました。
 
-元プロジェクトはここです。（https://github.com/docker/getting-started/tree/master/app）
+https://matsuand.github.io/docs.docker.jp.onthefly/get-started/
+
+元プロジェクトはここです。
+
+https://github.com/docker/getting-started/tree/master/app
 
 　
 
