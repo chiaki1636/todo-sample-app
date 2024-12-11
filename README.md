@@ -23,7 +23,7 @@ git clone https://github.com/chiaki1636/todo-sample-app
 ## コンテナを立てる
 ```bash
 cd todo-sample-app
-docker compose up --build
+docker compose up -d
 ```
 
 ## コンテナを削除する
