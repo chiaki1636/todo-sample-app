@@ -1,0 +1,84 @@
+# Docker Compose設定ファイル
+# 従来のDockerコマンドをDocker Composeで一元管理するための設定
+
+# Docker Compose仕様のバージョン
+# 最新の推奨バージョンを指定
+version: "3.8"
+
+# サービス（コンテナ）の定義
+services:
+  # Node.jsアプリケーションのサービス定義
+  app:
+    # 使用するDockerイメージ（タイプミスを修正）
+    image: node:16-alpine
+    
+    # コンテナ内で実行するコマンド
+    command: sh -c "yarn install && yarn run dev"
+
+    # ホストのポート3000をコンテナのポート3000にマッピング
+    ports:
+      - target: 3000
+        published: 3000
+        protocol: tcp
+        mode: host
+    
+    # コンテナ内の作業ディレクトリ
+    working_dir: /app
+    
+    # ホストのカレントディレクトリをコンテナの/appにマウント
+    volumes:
+      - type: bind
+        source: ./
+        target: /app
+    
+    # データベース接続のための環境変数（タイプミスを修正）
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_USER: root
+      MYSQL_PASSWORD: secret
+      MYSQL_DB: todos
+    
+    # MySQLサービスへの依存関係を明示
+    depends_on:
+      - mysql
+    
+    # ネットワークの指定
+    networks:
+      - todo-app-network
+
+  # MySQLデータベースサービスの定義
+  mysql:
+    # 使用するMySQLイメージ
+    image: mysql:5.7
+
+    # データの永続化設定
+    volumes:
+      - type: volume
+        source: todo-mysql-data
+        target: /var/lib/mysql
+    
+    # データベース設定のための環境変数（タイプミスを修正）
+    environment:
+      MYSQL_ROOT_PASSWORD: secret  # 'serect'から修正
+      MYSQL_DATABASE: todos
+    
+    # ネットワークの指定
+    networks:
+      - todo-app-network
+    
+    # ヘルスチェックの追加
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+# ネットワークの定義
+networks:
+  todo-app-network:
+    driver: bridge
+
+# ボリュームの定義
+volumes:
+  todo-mysql-data:
+    name: todo-mysql-data

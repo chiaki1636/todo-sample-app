@@ -1,0 +1,102 @@
+# このdocker-compose.ymlは
+# 以下のPowerShellで実行したコマンドを
+# 「docker-compose up -d」のコマンドで実行するために作成したもの
+
+# コマンド１
+# docker network create todo-app
+
+# コマンド２
+# docker run -dp 3000:3000 `
+#   -w /app -v "$(pwd):/app" `
+#   --network todo-app `
+#   -e MYSQL_HOST=mysql `
+#   -e MYSQL_USER=root `
+#   -e MYSQL_PASSWORD=secret `
+#   -e MYSQL_DB=todos `
+#   node:16-alpine `
+#   sh -c "yarn install && yarn run dev"
+
+# コマンド３
+# docker run -d `
+#   --network todo-app --network-alias mysql `
+#   -v todo-mysql-data:/var/lib/mysql `
+#   -e MYSQL_ROOT_PASSWORD=secret `
+#   -e MYSQL_DATABASE=todos `
+#   mysql:5.7
+
+
+
+
+# 以下から記載開始
+
+# Docker Compose はデフォルトで、アプリケーションに固有のネットワークを自動生成する
+# コマンド１に相当する記述がないのはこのため
+
+# スキーマバージョンの定義
+# たいていはサポートされている最新のバージョンを指定
+# https://github.com/compose-spec/compose-spec/blob/main/04-version-and-name.md
+version: "3.8"
+
+# 以下の文法群や説明にかんしては以下を参照
+# https://matsuand.github.io/docs.docker.jp.onthefly/compose/compose-file/compose-file-v3/
+
+# アプリケーションを構成するサービス（コンテナー）一覧を定義する
+services:
+  # コンテナーの名前（コンテナの中身が明示的であればどんな名前でもよい）
+  # 自動的にネットワークエイリアスになるため、他コンテナからアクセスする際に利用できる
+  app:
+    # 使うコンテナーイメージ
+    image: node:16-alpine
+    # 実行するコマンド
+    command: sh -c "yarn install && yarn run dev"
+
+    # ポートの設定（短い文法）
+    # コマンドプロンプトで実行した、「-p 3000:3000」に相当する箇所
+    ports:
+      - 3000:3000
+    
+    # ワーキングディレクトリの設定
+    # コマンドプロンプトで実行した、「-w /app」に相当する箇所
+    working_dir: /app
+    
+    # ボリュームマッピングの設定
+    # コマンドプロンプトで実行した、「-v "$(pwd):/app"」に相当する箇所
+    volumes:
+      - ./:/app
+    
+    # 環境設定
+    # ここでは接続するDBの設定をする
+    # コマンドプロンプトの実行では以下が相当する
+    # -e MYSQL_HOST=mysql
+    # -e MYSQL_USER=root
+    # -e MYSQL_PASSWORD=secret
+    # -e MYSQL_DB=todos
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_USER: root
+      MYSQL_PASSWORD: secret
+      MYSQL_DB: todos
+
+  # MySQLサーバーとなっているコンテナーの定義
+  # コンテナーの名前 兼 ネットワークエイリアス
+  mysql:
+    # 使用するベースイメージ
+    image: mysql:5.7
+
+    # コマンドプロンプトでは該当する箇所なし（自動生成）
+    # docker-compose.yml では明記する必要がある
+    # これだけで動作し、デフォルトのオプションがセットされるが
+    # オプションを個別で指定することも可能
+    volumes:
+      - todo-mysql-data:/var/lib/mysql
+    
+    # 環境設定
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: todos
+
+# 名前付きボリュームを作成
+# これを「mysql」というコンテナーのMySQLと紐づけている
+# docker volume create todo-mysql-data に相当する？
+volumes:
+  todo-mysql-data:

@@ -1,0 +1,19 @@
+# 依存関係のディレクトリ
+node_modules/
+
+# Node.js
+npm-debug.log
+yarn-error.log
+.pnp/
+.pnp.js
+
+# VSCode
+.vscode/
+*.code-workspace
+
+# ビルド関連
+dist/
+build/
+out/
+*.exe
+*.dll
